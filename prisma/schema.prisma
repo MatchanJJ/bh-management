@@ -1,0 +1,171 @@
+// Prisma schema for House/Room Rent Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - supports ADMIN, LANDLORD, and TENANT roles
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  roomsOwned       Room[]          @relation("LandlordRooms")
+  roomTenant       Room?           @relation("TenantRoom")
+  meterReadings    MeterReading[]  @relation("RecordedBy")
+  paymentsUploaded PaymentProof[]  @relation("UploadedBy")
+  paymentsVerified PaymentProof[]  @relation("VerifiedBy")
+  Account          Account[]
+  Session          Session[]
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  ADMIN
+  LANDLORD
+  TENANT
+}
+
+// Room model - represents rental units
+model Room {
+  id                    String   @id @default(cuid())
+  roomNumber            String
+  monthlyRent           Float
+  wifiFee               Float
+  electricityRatePerKwh Float
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  landlordId   String
+  landlord     User   @relation("LandlordRooms", fields: [landlordId], references: [id], onDelete: Cascade)
+  tenantId     String? @unique
+  tenant       User?   @relation("TenantRoom", fields: [tenantId], references: [id], onDelete: SetNull)
+  meterReadings MeterReading[]
+  billings      Billing[]
+
+  @@index([landlordId])
+  @@index([tenantId])
+  @@unique([landlordId, roomNumber])
+}
+
+// MeterReading model - monthly electricity meter readings
+model MeterReading {
+  id              String   @id @default(cuid())
+  month           String   // Format: YYYY-MM
+  previousReading Float
+  currentReading  Float
+  usage           Float    // Computed: currentReading - previousReading
+  meterPhotoUrl   String
+  createdAt       DateTime @default(now())
+
+  // Relations
+  roomId       String
+  room         Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  recordedById String
+  recordedBy   User   @relation("RecordedBy", fields: [recordedById], references: [id])
+
+  @@index([roomId, month])
+  @@unique([roomId, month])
+}
+
+// Billing model - monthly billing records
+model Billing {
+  id                String        @id @default(cuid())
+  month             String        // Format: YYYY-MM
+  rentAmount        Float
+  wifiAmount        Float
+  electricityAmount Float
+  totalAmount       Float
+  status            BillingStatus @default(PENDING)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  roomId   String
+  room     Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tenantId String
+  paymentProofs PaymentProof[]
+
+  @@index([roomId, month])
+  @@index([tenantId, status])
+  @@unique([roomId, month])
+}
+
+enum BillingStatus {
+  PENDING
+  PAID
+  VERIFIED
+}
+
+// PaymentProof model - payment verification
+model PaymentProof {
+  id              String        @id @default(cuid())
+  paymentMethod   PaymentMethod
+  receiptPhotoUrl String
+  createdAt       DateTime      @default(now())
+  verifiedAt      DateTime?
+
+  // Relations
+  billingId    String
+  billing      Billing @relation(fields: [billingId], references: [id], onDelete: Cascade)
+  uploadedById String
+  uploadedBy   User    @relation("UploadedBy", fields: [uploadedById], references: [id])
+  verifiedById String?
+  verifiedBy   User?   @relation("VerifiedBy", fields: [verifiedById], references: [id])
+
+  @@index([billingId])
+}
+
+enum PaymentMethod {
+  CASH
+  ONLINE
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
