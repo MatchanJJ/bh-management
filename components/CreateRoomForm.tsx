@@ -8,6 +8,7 @@ export default function CreateRoomForm() {
   const [monthlyRent, setMonthlyRent] = useState("")
   const [wifiFee, setWifiFee] = useState("")
   const [electricityRate, setElectricityRate] = useState("")
+  const [billingDueDay, setBillingDueDay] = useState("5")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
@@ -21,13 +22,15 @@ export default function CreateRoomForm() {
         roomNumber,
         monthlyRent: parseFloat(monthlyRent),
         wifiFee: parseFloat(wifiFee),
-        electricityRatePerKwh: parseFloat(electricityRate)
+        electricityRatePerKwh: parseFloat(electricityRate),
+        billingDueDay: parseInt(billingDueDay)
       })
       setMessage({ type: "success", text: "Room created successfully!" })
       setRoomNumber("")
       setMonthlyRent("")
       setWifiFee("")
       setElectricityRate("")
+      setBillingDueDay("5")
     } catch (error: any) {
       setMessage({ type: "error", text: error.message || "Failed to create room" })
     } finally {
@@ -49,7 +52,7 @@ export default function CreateRoomForm() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="space-y-2">
           <label htmlFor="roomNumber" className="text-sm font-medium leading-none">
             Room Number
@@ -108,6 +111,22 @@ export default function CreateRoomForm() {
             required
             min="0"
             step="0.01"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="billingDueDay" className="text-sm font-medium leading-none">
+            Billing Due Day
+          </label>
+          <input
+            type="number"
+            id="billingDueDay"
+            value={billingDueDay}
+            onChange={(e) => setBillingDueDay(e.target.value)}
+            required
+            min="1"
+            max="31"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
