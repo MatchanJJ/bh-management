@@ -116,6 +116,47 @@ export default async function TenantBillingPage() {
                   </div>
                 </div>
 
+                {/* Electricity Usage Breakdown */}
+                {billing.meterReading && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="text-sm font-semibold text-blue-900 mb-3">
+                      Electricity Usage Breakdown
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
+                      <div>
+                        <div className="text-xs text-blue-700">Previous Reading</div>
+                        <div className="font-semibold text-blue-900">
+                          {billing.meterReading.previousReading.toFixed(2)} kWh
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-blue-700">Current Reading</div>
+                        <div className="font-semibold text-blue-900">
+                          {billing.meterReading.currentReading.toFixed(2)} kWh
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-blue-700">Usage</div>
+                        <div className="font-semibold text-blue-900">
+                          {billing.meterReading.usage.toFixed(2)} kWh
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-blue-700">Rate</div>
+                        <div className="font-semibold text-blue-900">
+                          ₱{billing.room.electricityRatePerKwh.toFixed(2)}/kWh
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-blue-700">Calculation</div>
+                        <div className="font-semibold text-blue-900">
+                          {billing.meterReading.usage.toFixed(2)} × ₱{billing.room.electricityRatePerKwh.toFixed(2)} = ₱{billing.electricityAmount.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {billing.paymentProofs.length > 0 ? (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="text-sm text-gray-700">

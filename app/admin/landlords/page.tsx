@@ -20,54 +20,56 @@ export default async function LandlordsPage() {
       navItems={navItems}
     >
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Landlords Management
-        </h2>
-
-        {/* Create Landlord Form */}
-        <div className="mb-8 p-6 bg-gray-50 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Create New Landlord
-          </h3>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Landlords Management
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage landlord accounts and whitelist access
+            </p>
+          </div>
           <CreateLandlordForm />
         </div>
 
         {/* Landlords List */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            All Landlords ({landlords.length})
-          </h3>
+        <div className="rounded-lg border border-border bg-card">
+          <div className="p-6 border-b border-border">
+            <h3 className="text-base font-semibold">
+              All Landlords ({landlords.length})
+            </h3>
+          </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="h-12 px-6 text-left text-sm font-medium text-muted-foreground">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="h-12 px-6 text-left text-sm font-medium text-muted-foreground">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="h-12 px-6 text-left text-sm font-medium text-muted-foreground">
                     Rooms
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="h-12 px-6 text-left text-sm font-medium text-muted-foreground">
                     Joined
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody>
                 {landlords.map((landlord) => (
-                  <tr key={landlord.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={landlord.id} className="border-b border-border last:border-0">
+                    <td className="h-14 px-6 text-sm font-medium">
                       {landlord.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="h-14 px-6 text-sm text-muted-foreground">
                       {landlord.email}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="h-14 px-6 text-sm text-muted-foreground">
                       {landlord._count.roomsOwned}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="h-14 px-6 text-sm text-muted-foreground">
                       {new Date(landlord.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

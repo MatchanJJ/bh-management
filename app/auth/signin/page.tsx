@@ -83,8 +83,3 @@ export default function SignInPage() {
     </div>
   )
 }
-        </form>
-      </div>
-    </div>
-  )
-}

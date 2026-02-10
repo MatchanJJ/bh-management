@@ -15,6 +15,17 @@ export async function getBillingsByTenant() {
         select: {
           roomNumber: true,
           billingDueDay: true,
+          electricityRatePerKwh: true,
+          meterReadings: {
+            where: {
+              month: undefined // Will be filtered per billing
+            },
+            select: {
+              previousReading: true,
+              currentReading: true,
+              usage: true
+            }
+          },
           landlord: {
             select: {
               name: true,
@@ -35,7 +46,31 @@ export async function getBillingsByTenant() {
     orderBy: { month: "desc" }
   })
 
-  return billings
+  // Add meter reading for each billing's month
+  const billingsWithMeterReadings = await Promise.all(
+    billings.map(async (billing) => {
+      const meterReading = await prisma.meterReading.findUnique({
+        where: {
+          roomId_month: {
+            roomId: billing.roomId,
+            month: billing.month
+          }
+        },
+        select: {
+          previousReading: true,
+          currentReading: true,
+          usage: true
+        }
+      })
+
+      return {
+        ...billing,
+        meterReading
+      }
+    })
+  )
+
+  return billingsWithMeterReadings
 }
 
 export async function getBillingsByLandlord() {
