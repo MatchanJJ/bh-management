@@ -1,10 +1,10 @@
 "use client"
 
 import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-export default function SignInPage() {
+function SignInForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -81,5 +81,19 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+        </div>
+      </div>
+    }>
+      <SignInForm />
+    </Suspense>
   )
 }
