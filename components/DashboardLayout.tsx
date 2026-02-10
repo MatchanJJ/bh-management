@@ -32,7 +32,7 @@ export default function DashboardLayout({
           <div className="flex justify-between items-center h-16">
             <div>
               <h1 className="text-xl font-semibold tracking-tight">
-                BH Management
+                  Balay ni Joren
               </h1>
               <p className="text-xs text-muted-foreground">
                 {userName} · {userRole}

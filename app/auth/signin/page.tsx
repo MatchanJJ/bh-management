@@ -35,7 +35,7 @@ function SignInForm() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-semibold tracking-tight">
-            BH Management
+            Balay ni Joren
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Sign in with your whitelisted Google account
