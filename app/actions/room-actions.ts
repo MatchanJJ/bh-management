@@ -10,6 +10,7 @@ export async function createRoom(data: {
   monthlyRent: number
   wifiFee: number
   electricityRatePerKwh: number
+  billingDueDay: number
 }) {
   const user = await requireRole([UserRole.LANDLORD])
 
