@@ -33,6 +33,7 @@ export async function createRoom(data: {
       monthlyRent: data.monthlyRent,
       wifiFee: data.wifiFee,
       electricityRatePerKwh: data.electricityRatePerKwh,
+      billingDueDay: data.billingDueDay,
       landlordId: user.id
     }
   })
@@ -46,6 +47,7 @@ export async function updateRoom(roomId: string, data: {
   monthlyRent?: number
   wifiFee?: number
   electricityRatePerKwh?: number
+  billingDueDay?: number
 }) {
   const user = await requireRole([UserRole.LANDLORD])
 

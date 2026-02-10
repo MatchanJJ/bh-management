@@ -13,6 +13,7 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [roomId, setRoomId] = useState("")
+  const [billingDueDay, setBillingDueDay] = useState("5")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
@@ -22,12 +23,13 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
     setMessage(null)
 
     try {
-      await createTenant({ name, email, password, roomId })
+      await createTenant({ name, email, password, roomId, billingDueDay: parseInt(billingDueDay) })
       setMessage({ type: "success", text: "Tenant created successfully!" })
       setName("")
       setEmail("")
       setPassword("")
       setRoomId("")
+      setBillingDueDay("5")
     } catch (error: any) {
       setMessage({ type: "error", text: error.message || "Failed to create tenant" })
     } finally {
@@ -57,7 +59,7 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Full Name
@@ -119,6 +121,23 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label htmlFor="billingDueDay" className="block text-sm font-medium text-gray-700">
+            Billing Due Day
+          </label>
+          <input
+            type="number"
+            id="billingDueDay"
+            value={billingDueDay}
+            onChange={(e) => setBillingDueDay(e.target.value)}
+            required
+            min="1"
+            max="31"
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+          />
+          <p className="mt-1 text-xs text-gray-500">Day of month (1-31)</p>
         </div>
       </div>
 

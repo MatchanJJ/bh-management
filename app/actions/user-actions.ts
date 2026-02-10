@@ -49,6 +49,7 @@ export async function createTenant(data: {
   email: string
   password: string
   roomId: string
+  billingDueDay: number
 }) {
   await requireRole([UserRole.LANDLORD])
 
@@ -86,10 +87,15 @@ export async function createTenant(data: {
     }
   })
 
-  // Assign tenant to room
+  // Assign tenant to room with billing due day
   await prisma.room.update({
     where: { id: data.roomId },
-    data: { tenantId: tenant.id }
+    data: { 
+      tenant: {
+        connect: { id: tenant.id }
+      },
+      billingDueDay: data.billingDueDay
+    }
   })
 
   revalidatePath("/landlord/tenants")

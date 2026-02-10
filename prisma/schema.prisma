@@ -45,6 +45,7 @@ model Room {
   monthlyRent           Float
   wifiFee               Float
   electricityRatePerKwh Float
+  billingDueDay         Int      @default(5) // Day of month when billing is due (1-31)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 

@@ -3,6 +3,7 @@ import { UserRole } from "@prisma/client"
 import DashboardLayout from "@/components/DashboardLayout"
 import { getBillingsByLandlord } from "@/app/actions/billing-actions"
 import VerifyPaymentButton from "@/components/VerifyPaymentButton"
+import { calculateDueDateStatus, formatDueDate } from "@/lib/due-date-utils"
 
 export default async function LandlordBillingPage() {
   const user = await requireRole([UserRole.LANDLORD])
@@ -36,10 +37,23 @@ export default async function LandlordBillingPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {billings.map((billing) => (
+            {billings.map((billing) => {
+              const dueDateStatus = calculateDueDateStatus(
+                billing.month,
+                billing.room.billingDueDay,
+                billing.status
+              )
+              
+              return (
               <div
                 key={billing.id}
-                className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition"
+                className={`border-2 rounded-lg p-6 hover:shadow-md transition ${
+                  dueDateStatus.statusColor === 'red' && billing.status === 'PENDING'
+                    ? 'border-red-300 bg-red-50'
+                    : dueDateStatus.statusColor === 'yellow' && billing.status === 'PENDING'
+                    ? 'border-yellow-300 bg-yellow-50'
+                    : 'border-gray-200'
+                }`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -49,6 +63,24 @@ export default async function LandlordBillingPage() {
                     <p className="text-sm text-gray-500 mt-1">
                       Created {new Date(billing.createdAt).toLocaleDateString()}
                     </p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          dueDateStatus.statusColor === 'green'
+                            ? 'bg-green-100 text-green-800'
+                            : dueDateStatus.statusColor === 'yellow'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : dueDateStatus.statusColor === 'red'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {dueDateStatus.statusText}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        Due: {formatDueDate(dueDateStatus.dueDate)}
+                      </span>
+                    </div>
                   </div>
                   <span
                     className={`px-3 py-1 text-sm font-medium rounded-full ${
@@ -135,7 +167,8 @@ export default async function LandlordBillingPage() {
                   </div>
                 )}
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

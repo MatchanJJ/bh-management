@@ -14,7 +14,7 @@ export async function requireAuth() {
   }
   return user
 }
-//test
+
 export async function requireRole(allowedRoles: UserRole[]) {
   const user = await requireAuth()
   if (!allowedRoles.includes(user.role)) {
