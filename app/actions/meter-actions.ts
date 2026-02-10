@@ -5,9 +5,23 @@ import { requireRole } from "@/lib/auth-utils"
 import { UserRole } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 
+export async function getLastMeterReading(roomId: string) {
+  const lastReading = await prisma.meterReading.findFirst({
+    where: { roomId },
+    orderBy: { month: "desc" },
+    select: {
+      currentReading: true,
+      month: true
+    }
+  })
+
+  return lastReading
+}
+
 export async function createMeterReading(data: {
   roomId: string
   month: string // Format: YYYY-MM
+  previousReading: number
   currentReading: number
   meterPhotoUrl: string
 }) {
@@ -36,14 +50,7 @@ export async function createMeterReading(data: {
     throw new Error("Meter reading for this month already exists")
   }
 
-  // Get previous reading
-  const previousMeterReading = await prisma.meterReading.findFirst({
-    where: { roomId: data.roomId },
-    orderBy: { month: "desc" }
-  })
-
-  const previousReading = previousMeterReading?.currentReading || 0
-  const usage = data.currentReading - previousReading
+  const usage = data.currentReading - data.previousReading
 
   if (usage < 0) {
     throw new Error("Current reading cannot be less than previous reading")
@@ -55,7 +62,7 @@ export async function createMeterReading(data: {
       roomId: data.roomId,
       month: data.month,
       currentReading: data.currentReading,
-      previousReading,
+      previousReading: data.previousReading,
       usage,
       meterPhotoUrl: data.meterPhotoUrl,
       recordedById: user.id

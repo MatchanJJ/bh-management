@@ -36,13 +36,13 @@ export default function CreateRoomForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {message && (
         <div
-          className={`p-4 rounded-md ${
+          className={`rounded-lg border p-4 text-sm ${
             message.type === "success"
-              ? "bg-green-50 text-green-800"
-              : "bg-red-50 text-red-800"
+              ? "border-green-200 bg-green-50 text-green-900"
+              : "border-red-200 bg-red-50 text-red-900"
           }`}
         >
           {message.text}
@@ -50,8 +50,8 @@ export default function CreateRoomForm() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
-          <label htmlFor="roomNumber" className="block text-sm font-medium text-gray-700">
+        <div className="space-y-2">
+          <label htmlFor="roomNumber" className="text-sm font-medium leading-none">
             Room Number
           </label>
           <input
@@ -60,12 +60,12 @@ export default function CreateRoomForm() {
             value={roomNumber}
             onChange={(e) => setRoomNumber(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
 
-        <div>
-          <label htmlFor="monthlyRent" className="block text-sm font-medium text-gray-700">
+        <div className="space-y-2">
+          <label htmlFor="monthlyRent" className="text-sm font-medium leading-none">
             Monthly Rent (₱)
           </label>
           <input
@@ -76,12 +76,12 @@ export default function CreateRoomForm() {
             required
             min="0"
             step="0.01"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
 
-        <div>
-          <label htmlFor="wifiFee" className="block text-sm font-medium text-gray-700">
+        <div className="space-y-2">
+          <label htmlFor="wifiFee" className="text-sm font-medium leading-none">
             WiFi Fee (₱)
           </label>
           <input
@@ -92,12 +92,12 @@ export default function CreateRoomForm() {
             required
             min="0"
             step="0.01"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
 
-        <div>
-          <label htmlFor="electricityRate" className="block text-sm font-medium text-gray-700">
+        <div className="space-y-2">
+          <label htmlFor="electricityRate" className="text-sm font-medium leading-none">
             Electricity Rate (₱/kWh)
           </label>
           <input
@@ -108,18 +108,20 @@ export default function CreateRoomForm() {
             required
             min="0"
             step="0.01"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition disabled:bg-indigo-400"
-      >
-        {loading ? "Creating..." : "Create Room"}
-      </button>
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {loading ? "Creating..." : "Create Room"}
+        </button>
+      </div>
     </form>
   )
 }

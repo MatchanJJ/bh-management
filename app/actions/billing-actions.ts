@@ -14,6 +14,7 @@ export async function getBillingsByTenant() {
       room: {
         select: {
           roomNumber: true,
+          billingDueDay: true,
           landlord: {
             select: {
               name: true,
@@ -49,7 +50,8 @@ export async function getBillingsByLandlord() {
     include: {
       room: {
         select: {
-          roomNumber: true
+          roomNumber: true,
+          billingDueDay: true
         }
       },
       paymentProofs: {

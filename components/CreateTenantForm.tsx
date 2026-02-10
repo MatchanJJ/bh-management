@@ -11,7 +11,6 @@ type Room = {
 export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [roomId, setRoomId] = useState("")
   const [billingDueDay, setBillingDueDay] = useState("5")
   const [loading, setLoading] = useState(false)
@@ -23,15 +22,14 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
     setMessage(null)
 
     try {
-      await createTenant({ name, email, password, roomId, billingDueDay: parseInt(billingDueDay) })
-      setMessage({ type: "success", text: "Tenant created successfully!" })
+      await createTenant({ name, email, roomId, billingDueDay: parseInt(billingDueDay) })
+      setMessage({ type: "success", text: "Tenant whitelisted! They can now sign in with their Google account." })
       setName("")
       setEmail("")
-      setPassword("")
       setRoomId("")
       setBillingDueDay("5")
     } catch (error: any) {
-      setMessage({ type: "error", text: error.message || "Failed to create tenant" })
+      setMessage({ type: "error", text: error.message || "Failed to whitelist tenant" })
     } finally {
       setLoading(false)
     }
@@ -39,29 +37,29 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
 
   if (rooms.length === 0) {
     return (
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-muted-foreground rounded-lg border border-dashed p-4 text-center">
         No vacant rooms available. Please create rooms first or remove tenants from existing rooms.
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {message && (
         <div
-          className={`p-4 rounded-md ${
+          className={`rounded-lg border p-4 text-sm ${
             message.type === "success"
-              ? "bg-green-50 text-green-800"
-              : "bg-red-50 text-red-800"
+              ? "border-green-200 bg-green-50 text-green-900"
+              : "border-red-200 bg-red-50 text-red-900"
           }`}
         >
           {message.text}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <label htmlFor="name" className="text-sm font-medium leading-none">
             Full Name
           </label>
           <input
@@ -70,13 +68,13 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm font-medium leading-none">
+            Google Email
           </label>
           <input
             type="email"
@@ -84,35 +82,21 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="user@gmail.com"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="roomId" className="block text-sm font-medium text-gray-700">
-            Assign to Room
+        <div className="space-y-2">
+          <label htmlFor="roomId" className="text-sm font-medium leading-none">
+            Room
           </label>
           <select
             id="roomId"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <option value="">Select room</option>
             {rooms.map((room) => (
@@ -123,9 +107,9 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
           </select>
         </div>
 
-        <div>
-          <label htmlFor="billingDueDay" className="block text-sm font-medium text-gray-700">
-            Billing Due Day
+        <div className="space-y-2">
+          <label htmlFor="billingDueDay" className="text-sm font-medium leading-none">
+            Due Day
           </label>
           <input
             type="number"
@@ -135,19 +119,21 @@ export default function CreateTenantForm({ rooms }: { rooms: Room[] }) {
             required
             min="1"
             max="31"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
-          <p className="mt-1 text-xs text-gray-500">Day of month (1-31)</p>
+          <p className="text-xs text-muted-foreground">Day of month (1-31)</p>
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition disabled:bg-indigo-400"
-      >
-        {loading ? "Creating..." : "Create Tenant"}
-      </button>
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {loading ? "Whitelisting..." : "Whitelist Tenant"}
+        </button>
+      </div>
     </form>
   )
 }

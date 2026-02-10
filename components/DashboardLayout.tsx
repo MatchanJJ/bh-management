@@ -25,22 +25,22 @@ export default function DashboardLayout({
   const pathname = usePathname()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50">
       {/* Header */}
-      <header className="bg-white shadow">
+      <header className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center h-16">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                BH Management System
+              <h1 className="text-xl font-semibold tracking-tight">
+                BH Management
               </h1>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {userName} · {userRole}
               </p>
             </div>
             <button
               onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 bg-transparent hover:bg-accent hover:text-accent-foreground border border-input transition-colors"
             >
               Sign Out
             </button>
@@ -48,35 +48,32 @@ export default function DashboardLayout({
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar Navigation */}
-          <aside className="lg:w-64 flex-shrink-0">
-            <nav className="bg-white rounded-lg shadow p-4">
-              <ul className="space-y-2">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className={`block px-4 py-2 rounded-md transition ${
-                          isActive
-                            ? "bg-indigo-50 text-indigo-700 font-medium"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
+          <aside className="lg:w-56 flex-shrink-0">
+            <nav className="space-y-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`block px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      isActive
+                        ? "bg-secondary text-secondary-foreground"
+                        : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
             </nav>
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 bg-white rounded-lg shadow p-6">
+          <main className="flex-1">
             {children}
           </main>
         </div>

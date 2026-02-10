@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient({
   log: ['query', 'error', 'warn'],
@@ -19,21 +18,20 @@ async function main() {
     return;
   }
 
-  // Create admin user
-  const passwordHash = await bcrypt.hash("admin123", 10);
+  // Create admin user (replace with your Google email)
   const admin = await prisma.user.create({
     data: {
-      name: "Admin",
-      email: "admin@bh.com",
-      passwordHash,
+      name: "AdminMark",
+      email: "jedzxcx1@gmail.com", // Replace with your Google email
       role: "ADMIN",
+      isActive: true
     },
   });
 
-  console.log("✅ Admin user created:");
-  console.log("   Email: admin@bh.com");
-  console.log("   Password: admin123");
+  console.log("✅ Admin user whitelisted:");
+  console.log("   Email:", admin.email);
   console.log("   ID:", admin.id);
+  console.log("   This email can now sign in with Google OAuth");
 }
 
 main()

@@ -9,7 +9,6 @@ import { revalidatePath } from "next/cache"
 export async function createLandlord(data: {
   name: string
   email: string
-  password: string
 }) {
   await requireRole([UserRole.ADMIN])
 
@@ -22,15 +21,13 @@ export async function createLandlord(data: {
     throw new Error("Email already exists")
   }
 
-  // Hash password
-  const passwordHash = await bcrypt.hash(data.password, 10)
-
+  // Create landlord (whitelisted, waiting for Google sign-in)
   const landlord = await prisma.user.create({
     data: {
       name: data.name,
       email: data.email,
-      passwordHash,
-      role: UserRole.LANDLORD
+      role: UserRole.LANDLORD,
+      isActive: true
     }
   })
 
@@ -47,7 +44,6 @@ export async function createLandlord(data: {
 export async function createTenant(data: {
   name: string
   email: string
-  password: string
   roomId: string
   billingDueDay: number
 }) {
@@ -59,6 +55,32 @@ export async function createTenant(data: {
   })
 
   if (existingUser) {
+    // If user exists but is inactive, reactivate them
+    if (!existingUser.isActive && existingUser.role === UserRole.TENANT) {
+      // Assign to new room
+      const tenant = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: { isActive: true }
+      })
+
+      await prisma.room.update({
+        where: { id: data.roomId },
+        data: { 
+          tenant: { connect: { id: tenant.id } },
+          billingDueDay: data.billingDueDay
+        }
+      })
+
+      revalidatePath("/landlord/tenants")
+      revalidatePath("/landlord/rooms")
+
+      return {
+        id: tenant.id,
+        name: tenant.name,
+        email: tenant.email,
+        role: tenant.role
+      }
+    }
     throw new Error("Email already exists")
   }
 
@@ -75,15 +97,13 @@ export async function createTenant(data: {
     throw new Error("Room already has a tenant")
   }
 
-  // Hash password
-  const passwordHash = await bcrypt.hash(data.password, 10)
-
+  // Create tenant (whitelisted, waiting for Google sign-in)
   const tenant = await prisma.user.create({
     data: {
       name: data.name,
       email: data.email,
-      passwordHash,
-      role: UserRole.TENANT
+      role: UserRole.TENANT,
+      isActive: true
     }
   })
 
@@ -143,9 +163,11 @@ export async function getAllTenants() {
       id: true,
       name: true,
       email: true,
+      isActive: true,
       createdAt: true,
       roomTenant: {
         select: {
+          id: true,
           roomNumber: true
         }
       }
@@ -154,4 +176,91 @@ export async function getAllTenants() {
   })
 
   return tenants
+}
+
+export async function deactivateTenant(tenantId: string) {
+  const user = await requireRole([UserRole.LANDLORD])
+
+  // Verify tenant exists and belongs to landlord's rooms
+  const tenant = await prisma.user.findFirst({
+    where: {
+      id: tenantId,
+      role: UserRole.TENANT,
+      roomTenant: {
+        landlordId: user.id
+      }
+    },
+    include: {
+      roomTenant: true
+    }
+  })
+
+  if (!tenant) {
+    throw new Error("Tenant not found or unauthorized")
+  }
+
+  // Deactivate the tenant (archive)
+  await prisma.user.update({
+    where: { id: tenantId },
+    data: { isActive: false }
+  })
+
+  // Remove tenant from room
+  if (tenant.roomTenant) {
+    await prisma.room.update({
+      where: { id: tenant.roomTenant.id },
+      data: { tenantId: null }
+    })
+  }
+
+  revalidatePath("/landlord/tenants")
+  revalidatePath("/landlord/rooms")
+
+  return { success: true }
+}
+
+export async function reactivateTenant(tenantId: string, roomId: string, billingDueDay: number) {
+  const user = await requireRole([UserRole.LANDLORD])
+
+  // Verify tenant exists and is inactive
+  const tenant = await prisma.user.findUnique({
+    where: { id: tenantId }
+  })
+
+  if (!tenant || tenant.isActive) {
+    throw new Error("Tenant not found or already active")
+  }
+
+  // Check room availability
+  const room = await prisma.room.findUnique({
+    where: { id: roomId }
+  })
+
+  if (!room || room.landlordId !== user.id) {
+    throw new Error("Room not found or unauthorized")
+  }
+
+  if (room.tenantId) {
+    throw new Error("Room already has a tenant")
+  }
+
+  // Reactivate tenant
+  await prisma.user.update({
+    where: { id: tenantId },
+    data: { isActive: true }
+  })
+
+  // Assign to room
+  await prisma.room.update({
+    where: { id: roomId },
+    data: {
+      tenant: { connect: { id: tenantId } },
+      billingDueDay
+    }
+  })
+
+  revalidatePath("/landlord/tenants")
+  revalidatePath("/landlord/rooms")
+
+  return { success: true }
 }

@@ -2,8 +2,17 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Admin client for server-side operations that bypass RLS
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+})
 
 export async function uploadImage(
   file: File,
@@ -14,7 +23,7 @@ export async function uploadImage(
   const fileName = `${userId}-${Date.now()}.${fileExt}`
   const filePath = `${bucket}/${fileName}`
 
-  const { data, error } = await supabase.storage
+  const { data, error } = await supabaseAdmin.storage
     .from(bucket)
     .upload(filePath, file, {
       cacheControl: '3600',
@@ -26,7 +35,7 @@ export async function uploadImage(
   }
 
   // Get public URL
-  const { data: urlData } = supabase.storage
+  const { data: urlData } = supabaseAdmin.storage
     .from(bucket)
     .getPublicUrl(data.path)
 
@@ -42,7 +51,7 @@ export async function deleteImage(url: string, bucket: string): Promise<void> {
 
   const filePath = `${bucket}/${urlParts[1]}`
 
-  const { error } = await supabase.storage
+  const { error } = await supabaseAdmin.storage
     .from(bucket)
     .remove([filePath])
 

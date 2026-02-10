@@ -24,83 +24,92 @@ export default async function MeterReadingsPage() {
       userRole="Landlord"
       navItems={navItems}
     >
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Meter Readings
-        </h2>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-semibold tracking-tight">
+            Meter Readings
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Track and manage electricity meter readings
+          </p>
+        </div>
 
         {/* Create Meter Reading Form */}
-        <div className="mb-8 p-6 bg-gray-50 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="text-lg font-medium mb-4">
             Record New Meter Reading
           </h3>
           <CreateMeterReadingForm rooms={rooms} />
         </div>
 
         {/* Meter Readings List */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Recent Meter Readings
-          </h3>
+        <div className="rounded-lg border bg-card">
+          <div className="p-6 pb-3">
+            <h3 className="text-lg font-medium">
+              Recent Readings
+            </h3>
+          </div>
           {meterReadings.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
+            <p className="text-sm text-muted-foreground text-center py-8">
               No meter readings recorded yet.
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Room #
+            <div className="relative w-full overflow-auto">
+              <table className="w-full caption-bottom text-sm">
+                <thead className="border-t">
+                  <tr className="border-b">
+                    <th className="h-12 px-6 text-left align-middle font-medium text-muted-foreground">
+                      Room
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="h-12 px-6 text-left align-middle font-medium text-muted-foreground">
                       Tenant
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="h-12 px-6 text-left align-middle font-medium text-muted-foreground">
                       Month
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="h-12 px-6 text-left align-middle font-medium text-muted-foreground">
                       Previous
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="h-12 px-6 text-left align-middle font-medium text-muted-foreground">
                       Current
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Usage (kWh)
+                    <th className="h-12 px-6 text-left align-middle font-medium text-muted-foreground">
+                      Usage
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="h-12 px-6 text-left align-middle font-medium text-muted-foreground">
                       Photo
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody>
                   {meterReadings.map((reading) => (
-                    <tr key={reading.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={reading.id} className="border-b">
+                      <td className="p-6 align-middle font-medium">
                         {reading.room.roomNumber}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="p-6 align-middle text-muted-foreground">
                         {reading.room.tenant?.name || "—"}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {reading.month}
+                      <td className="p-6 align-middle">
+                        <span className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold">
+                          {reading.month}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {reading.previousReading.toFixed(2)}
+                      <td className="p-6 align-middle text-muted-foreground">
+                        {reading.previousReading.toFixed(2)} kWh
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {reading.currentReading.toFixed(2)}
+                      <td className="p-6 align-middle text-muted-foreground">
+                        {reading.currentReading.toFixed(2)} kWh
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                        {reading.usage.toFixed(2)}
+                      <td className="p-6 align-middle font-semibold">
+                        {reading.usage.toFixed(2)} kWh
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <td className="p-6 align-middle">
                         <a
                           href={reading.meterPhotoUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-900"
+                          className="text-sm font-medium underline underline-offset-4 hover:text-primary"
                         >
                           View
                         </a>

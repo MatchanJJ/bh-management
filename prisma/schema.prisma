@@ -11,13 +11,15 @@ datasource db {
 
 // User model - supports ADMIN, LANDLORD, and TENANT roles
 model User {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   name         String
-  email        String   @unique
-  passwordHash String
+  email        String    @unique
+  passwordHash String?   // Optional for Google OAuth users
+  googleId     String?   @unique // Google OAuth ID
   role         UserRole
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isActive     Boolean   @default(true) // Active/Inactive status for whitelist
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   // Relations
   roomsOwned       Room[]          @relation("LandlordRooms")
@@ -30,6 +32,8 @@ model User {
 
   @@index([email])
   @@index([role])
+  @@index([googleId])
+  @@index([isActive])
 }
 
 enum UserRole {
